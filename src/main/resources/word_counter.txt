@@ -1,0 +1,1 @@
+/Users/sergiilisnychyi/Documents/kpi/kpi_resources/a.txt = 2
