@@ -2,7 +2,6 @@ package lab3.task3_1;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,17 +10,17 @@ import static java.util.concurrent.ThreadLocalRandom.current;
 
 public class App {
     private static final String[] COLORS = {"red", "blue", "green"};
-    private static final Map<Integer, Supplier<Shape>> SHAPE_SUPPLIERS = Map.of(
-            1, () -> new Rectangle(getRandomColor(),
+    private static final List<Supplier<Shape>> SHAPE_SUPPLIERS = List.of(
+            () -> new Rectangle(getRandomColor(),
                     current().nextInt(1, 10), current().nextInt(1, 10)),
-            2, () -> new Circle(getRandomColor(),
+            () -> new Circle(getRandomColor(),
                     current().nextInt(1, 10)),
-            3, () -> new Triangle(getRandomColor(),
+            () -> new Triangle(getRandomColor(),
                     current().nextInt(1, 10), current().nextInt(1, 10))
     );
 
     public static void main(String[] args) {
-        List<Shape> shapes = IntStream.generate(() -> current().nextInt(1, 4))
+        List<Shape> shapes = IntStream.generate(() -> current().nextInt(SHAPE_SUPPLIERS.size()))
                 .limit(10)
                 .mapToObj(SHAPE_SUPPLIERS::get)
                 .map(Supplier::get)
@@ -44,10 +43,7 @@ public class App {
 
         System.out.println("#4");
         System.out.println("Sorted values by area");
-        shapes.sort((o1, o2) -> {
-            if (o1.calcArea() == o2.calcArea()) return 0;
-            return o1.calcArea() < o2.calcArea() ? 1 : -1;
-        });
+        shapes.sort((o1, o2) -> (int) (o1.calcArea() - o2.calcArea()));
         shapes.forEach(e -> System.out.println(e.shapeColor + " " + e.getClass().getSimpleName() + " area is " + e.calcArea()));
 
 
@@ -58,7 +54,7 @@ public class App {
     }
 
     private static String getRandomColor() {
-        return COLORS[current().nextInt(3)];
+        return COLORS[current().nextInt(COLORS.length)];
     }
 
 }
