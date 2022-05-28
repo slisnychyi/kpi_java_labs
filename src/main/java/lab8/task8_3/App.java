@@ -2,6 +2,7 @@ package lab8.task8_3;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +14,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
 
 public class App {
     public static void main(String[] args) {
-        File dir = Paths.get("/Users/sergiilisnychyi/Documents/kpi/kpi_resources").toFile();
+        File dir = Paths.get("/Users/sergiilisnychyi/Documents/").toFile();
         Path resultPath = Paths.get("src/main/resources/word_counter.txt");
         String word = "a";
         processDir(dir, resultPath, word);
@@ -38,16 +39,17 @@ public class App {
                 });
     }
 
-    private static void processFile(File file, Path resultPath, String word) {
+    private synchronized static void processFile(File file, Path resultPath, String word) {
         try {
-            long words = Files.readAllLines(file.toPath()).stream()
+            System.out.println("reading file = " + file);
+            long words = Files.readAllLines(file.toPath(), Charset.forName("ISO-8859-1")).stream()
                     .flatMap(e -> Arrays.stream(e.split(" ")))
                     .filter(e -> e.startsWith(word))
                     .count();
             String line = file.getAbsolutePath() + " = " + words + "\n";
             Files.write(resultPath, line.getBytes(), APPEND);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("unable to read file, cause = " + e.getMessage());
         }
     }
 
