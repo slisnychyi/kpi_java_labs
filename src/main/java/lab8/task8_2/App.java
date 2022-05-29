@@ -7,14 +7,14 @@ import java.util.concurrent.*;
 public class App {
     private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool();
 
-    public static void main(String[] args) {
-        int[] values = generateElems(5);
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        int[] values = generateElems(10);
         System.out.println("Values = " + Arrays.toString(values));
         int sum = calculateSum(values, 0, values.length - 1);
         System.out.println("Sum = " + sum);
     }
 
-    private static int calculateSum(int[] values, int i, int j) {
+    private static int calculateSum(int[] values, int i, int j) throws ExecutionException, InterruptedException {
         if (j - i <= 2) {
             int sum = 0;
             while (i < j) {
@@ -24,23 +24,8 @@ public class App {
         }
         int mid = ((j - i) / 2) + i;
         int finalI = i;
-        return FORK_JOIN_POOL.invokeAll(List.of(
-                () -> calculateSum(values, finalI, mid),
-                (Callable<Integer>) () -> calculateSum(values, mid, j)
-        )).stream()
-                .mapToInt(App::execute)
-                .sum();
+        return calculateSum(values, finalI, mid) + calculateSum(values, mid, j);
     }
-
-    private static Integer execute(Future<Integer> e) {
-        try {
-            return e.get();
-        } catch (InterruptedException | ExecutionException interruptedException) {
-            interruptedException.printStackTrace();
-            throw new IllegalStateException();
-        }
-    }
-
 
     private static int[] generateElems(int size) {
         int[] result = new int[size];
